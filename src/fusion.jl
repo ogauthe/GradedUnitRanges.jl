@@ -45,7 +45,7 @@ function fuse_blocklengths(x::Integer, y::Integer)
   return blockedrange([x * y])
 end
 
-using ..LabelledNumbers: LabelledInteger, label, labelled, unlabel
+using LabelledNumbers: LabelledInteger, label, labelled, unlabel
 function fuse_blocklengths(x::LabelledInteger, y::LabelledInteger)
   # return blocked unit range to keep non-abelian interface
   return blockedrange([labelled(x * y, fuse_labels(label(x), label(y)))])
@@ -76,14 +76,14 @@ function groupsortperm(v; kwargs...)
   return BlockVector(perm, group_lengths)
 end
 
-# Used by `TensorAlgebra.splitdims` in `BlockSparseArraysGradedAxesExt`.
+# Used by `TensorAlgebra.splitdims` in `BlockSparseArraysGradedUnitRangesExt`.
 # Get the permutation for sorting, then group by common elements.
 # groupsortperm([2, 1, 2, 3]) == [[2], [1, 3], [4]]
 function blockmergesortperm(a::AbstractUnitRange)
   return Block.(groupsortperm(blocklabels(nondual(a))))
 end
 
-# Used by `TensorAlgebra.splitdims` in `BlockSparseArraysGradedAxesExt`.
+# Used by `TensorAlgebra.splitdims` in `BlockSparseArraysGradedUnitRangesExt`.
 invblockperm(a::Vector{<:Block{1}}) = Block.(invperm(Int.(a)))
 
 function blockmergesort(g::AbstractGradedUnitRange)

@@ -1,8 +1,8 @@
 [deps]
-BlockArrays = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 GradedUnitRanges = "e2de450a-8a67-46c7-b59c-01d5a3d041c5"
 LabelledNumbers = "f856a3a6-4152-4ec4-b2a7-02c1a55d7993"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 
 [sources]
 LabelledNumbers = {url = "https://github.com/ITensor/LabelledNumbers.jl"}
