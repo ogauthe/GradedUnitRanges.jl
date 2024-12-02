@@ -14,8 +14,8 @@ using BlockArrays:
   mortar,
   combine_blockaxes
 using GradedUnitRanges:
-  GradedUnitRanges,
   AbstractGradedUnitRange,
+  GradedUnitRanges,
   GradedUnitRangeDual,
   LabelledUnitRangeDual,
   OneToOne,
@@ -23,11 +23,14 @@ using GradedUnitRanges:
   blockmergesortperm,
   blocksortperm,
   dual,
+  dual_type,
   flip,
-  space_isequal,
   gradedrange,
   isdual,
-  nondual
+  nondual,
+  nondual_type,
+  space_isequal,
+  sector_type
 using LabelledNumbers:
   LabelledInteger, LabelledUnitRange, label, label_type, labelled, labelled_isequal, unlabel
 using Test: @test, @test_broken, @testset
@@ -70,7 +73,8 @@ end
   @test !isdual(la)
   @test labelled_isequal(la, la)
   @test space_isequal(la, la)
-  @test label_type(la) == U1
+  @test label_type(la) === U1
+  @test sector_type(la) === U1
 
   @test iterate(la) == (1, 1)
   @test iterate(la) == (1, 1)
@@ -90,7 +94,13 @@ end
   @test isdual(lad)
   @test nondual(lad) === la
   @test dual(lad) === la
-  @test label_type(lad) == U1
+  @test label_type(lad) === U1
+  @test sector_type(lad) === U1
+
+  @test dual_type(la) === typeof(lad)
+  @test dual_type(lad) === typeof(la)
+  @test nondual_type(lad) === typeof(la)
+  @test nondual_type(la) === typeof(la)
 
   @test iterate(lad) == (1, 1)
   @test iterate(lad) == (1, 1)
@@ -155,6 +165,7 @@ end
     @test eltype(ad) == LabelledInteger{Int,U1}
     @test blocklengths(ad) isa Vector
     @test eltype(blocklengths(ad)) == eltype(blocklengths(a))
+    @test sector_type(a) === U1
 
     @test space_isequal(dual(ad), a)
     @test space_isequal(nondual(ad), a)
@@ -162,6 +173,11 @@ end
     @test space_isequal(ad, ad)
     @test !space_isequal(a, ad)
     @test !space_isequal(ad, a)
+
+    @test dual_type(a) === typeof(ad)
+    @test dual_type(ad) === typeof(a)
+    @test nondual_type(ad) === typeof(a)
+    @test nondual_type(a) === typeof(a)
 
     @test isdual(ad)
     @test !isdual(a)
