@@ -1,3 +1,33 @@
+using BlockArrays:
+  BlockArrays,
+  AbstractBlockedUnitRange,
+  Block,
+  BlockIndexRange,
+  BlockRange,
+  BlockSlice,
+  BlockedOneTo,
+  BlockedUnitRange,
+  block,
+  blockedrange,
+  blockisequal,
+  blocklasts,
+  blocklength,
+  blocks,
+  blockindex,
+  combine_blockaxes,
+  sortedunion
+using Compat: allequal
+using FillArrays: Fill
+using LabelledNumbers:
+  LabelledNumbers,
+  LabelledInteger,
+  LabelledUnitRange,
+  label,
+  label_type,
+  labelled,
+  labelled_isequal,
+  unlabel
+
 abstract type AbstractGradedUnitRange{T,BlockLasts} <:
               AbstractBlockedUnitRange{T,BlockLasts} end
 
