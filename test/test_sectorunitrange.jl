@@ -86,10 +86,10 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   @test sr[Block(1)] === sr
   @test_throws BlockBoundsError sr[Block(2)]
 
-  sr2 = sr[:, 1]
+  sr2 = sr[(:, 1)]
   @test sr2 isa SectorUnitRange
   @test space_isequal(sr2, sectorunitrange(SU((1, 0)), 2:2, false, 3))
-  sr3 = sr[:, 1:2]
+  sr3 = sr[(:, 1:2)]
   @test sr3 isa SectorUnitRange
   @test space_isequal(sr3, sectorunitrange(SU((1, 0)), 2:3, false, 3))
 end

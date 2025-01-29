@@ -66,13 +66,13 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   @test space_isequal(g2[Block.(1:2)], g2)
   @test space_isequal(g2[Block.(1:2)], g2)
 
-  @test space_isequal(g2[(Block(1),:,1)], sectorunitrange(SU((1, 0)), 1:1, false, 1))
-  @test space_isequal(g2[(Block(1),:,2)], sectorunitrange(SU((1, 0)), 2:2, false, 1))
-  @test space_isequal(g2[(Block(1),:,1:2)], sectorunitrange(SU((1, 0)), 1:2, false, 1))
-  @test_throws BoundsError g2[(Block(1),:,3)]
+  @test space_isequal(g2[(Block(1), 1)], sectorunitrange(SU((1, 0)), 1:1, false, 1))
+  @test space_isequal(g2[(Block(1), 2)], sectorunitrange(SU((1, 0)), 2:2, false, 1))
+  @test space_isequal(g2[(Block(1), 1:2)], sectorunitrange(SU((1, 0)), 1:2, false, 1))
+  @test_throws BoundsError g2[(Block(1), 3)]
 
-  @test space_isequal(g2[(Block(2),:,1)], sectorunitrange(SU((2, 1)), 3:3, false, 6))
-  @test space_isequal(g2[(Block(2),:,1:1)], sectorunitrange(SU((2, 1)), 3:3, false, 6))
-  @test_throws BoundsError g2[(Block(2),:,2)]
-  @test_throws BoundsError g2[(Block(2),:,3:3)]  # misleading?
+  @test space_isequal(g2[(Block(2), 1)], sectorunitrange(SU((2, 1)), 3:3, false, 6))
+  @test space_isequal(g2[(Block(2), 1:1)], sectorunitrange(SU((2, 1)), 3:3, false, 6))
+  @test_throws BoundsError g2[(Block(2), 2)]
+  @test_throws BoundsError g2[(Block(2), 3:3)]  # misleading?
 end

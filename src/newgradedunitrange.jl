@@ -93,7 +93,7 @@ function BlockArrays.blocklasts(g::NewGradedUnitRange)
 end
 
 #
-# getitem & slicing
+# slicing
 #
 Base.getindex(g::NewGradedUnitRange, b::Block{1}) = blocks(g)[Int(b)]
 
@@ -103,7 +103,7 @@ function Base.getindex(
   return mortar(blocks(g)[Int.(br)])
 end
 
-# TODO remove Tuple with kronecker(:, .)
-function Base.getindex(g::NewGradedUnitRange, bx::Tuple{<:Block{1},Colon,<:Any})
-  return blocks(g)[Int(first(bx))][:, last(bx)]
+# TODO replace Tuple with kronecker
+function Base.getindex(g::NewGradedUnitRange, bx::Tuple{<:Block{1},<:Any})
+  return blocks(g)[Int(first(bx))][(:, last(bx))]
 end

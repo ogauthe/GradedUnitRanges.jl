@@ -47,16 +47,17 @@ Base.iterate(sr::SectorUnitRange, i::Integer) = iterate(first(sr):last(sr), i)
 
 Base.last(sr::SectorUnitRange) = first(sr) + length(sr)
 
+# slicing
 Base.getindex(sr::SectorUnitRange, i::Integer) = range(sr)[i]
 function Base.getindex(sr::SectorUnitRange, r::AbstractUnitRange{T}) where {T<:Integer}
   return range(sr)[r]
 end
 
-# TODO replace Colon indexing with kronecker(:, i)
-Base.getindex(sr::SectorUnitRange, ::Colon, i2::Integer) = sr[:, i2:i2]
-function Base.getindex(sr::SectorUnitRange, ::Colon, r::AbstractUnitRange)
+# TODO replace (:,x) indexing with kronecker(:, x)
+Base.getindex(sr::SectorUnitRange, t::Tuple{Colon,<:Integer}) = sr[(:, last(t):last(t))]
+function Base.getindex(sr::SectorUnitRange, t::Tuple{Colon,<:AbstractUnitRange})
   return sectorunitrange(
-    nondual_sector(sr), multiplicity_range(sr)[r], isdual(sr), offset(sr)
+    nondual_sector(sr), multiplicity_range(sr)[last(t)], isdual(sr), offset(sr)
   )
 end
 
