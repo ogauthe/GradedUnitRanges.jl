@@ -13,7 +13,6 @@ using GradedUnitRanges:
   isdual,
   multiplicity_range,
   nondual_sector,
-  offset,
   sector_type,
   sectorunitrange,
   space_isequal
