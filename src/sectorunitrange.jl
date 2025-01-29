@@ -77,9 +77,7 @@ function blocklabels(sr::SectorUnitRange)
 end
 
 function dual(sr::SectorUnitRange)
-  return sectorunitrange(
-    nondual_sector(sr), multiplicity_range(sr), !isdual(sr), first(sr)
-  )
+  return sectorunitrange(nondual_sector(sr), multiplicity_range(sr), !isdual(sr), first(sr))
 end
 
 function flip(sr::SectorUnitRange)
