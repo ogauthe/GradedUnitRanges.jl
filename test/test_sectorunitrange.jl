@@ -10,7 +10,6 @@ using GradedUnitRanges:
   isdual,
   multiplicity_range,
   nondual_sector,
-  offset,
   sector_type,
   sectorunitrange,
   space_isequal
@@ -30,7 +29,7 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   # accessors
   @test nondual_sector(sr) == SU((1, 0))
   @test multiplicity_range(sr) == 2:3
-  @test offset(sr) == 3
+  @test first(sr) == 3
   @test !isdual(sr)
 
   @test space_isequal(
@@ -41,8 +40,7 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   @test length(sr) == 6
   @test firstindex(sr) == 1
   @test lastindex(sr) == 6
-  @test first(sr) == 6
-  @test last(sr) == 12
+  @test last(sr) == 9
   @test eltype(sr) === Int
   @test eachindex(sr) == Base.oneto(6)
 
@@ -68,21 +66,23 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   @test nondual_sector(srd) == SU((1, 0))
   @test blocklabels(srd) == [SU((1, 1))]
   @test multiplicity_range(srd) == 2:3
-  @test offset(srd) == 3
+  @test first(srd) == 3
   @test isdual(srd)
 
   srf = flip(sr)
   @test nondual_sector(srf) == SU((1, 1))
   @test blocklabels(srf) == [SU((1, 0))]
   @test multiplicity_range(srf) == 2:3
-  @test offset(srf) == 3
+  @test first(srf) == 3
   @test isdual(srf)
 
   # getindex
-  for i in 1:6
-    @test sr[i] == i + 5
+  @test_throws BoundsError sr[0]
+  @test_throws BoundsError sr[8]
+  for i in 1:7
+    @test sr[i] == i + 2
   end
-  @test sr[2:3] == 7:8
+  @test sr[2:3] == 4:5
   @test sr[Block(1)] === sr
   @test_throws BlockBoundsError sr[Block(2)]
 

@@ -23,7 +23,7 @@ sectorunitrange(s, r, b=false, offset=1) = SectorUnitRange(s, r, b, offset)
 nondual_sector(sr::SectorUnitRange) = sr.nondual_sector
 multiplicity_range(sr::SectorUnitRange) = sr.multiplicity_range
 isdual(sr::SectorUnitRange) = sr.isdual
-offset(sr::SectorUnitRange) = sr.offset
+Base.first(sr::SectorUnitRange) = sr.offset
 
 #
 # Base interface
@@ -31,10 +31,6 @@ offset(sr::SectorUnitRange) = sr.offset
 Base.axes(sr::SectorUnitRange) = Base.oneto(length(sr))
 
 Base.eachindex(sr::SectorUnitRange) = Base.oneto(length(sr))
-
-function Base.first(sr::SectorUnitRange)
-  return offset(sr) + length(nondual_sector(sr)) * (first(multiplicity_range(sr)) - 1)
-end
 
 Base.lastindex(sr::SectorUnitRange) = length(sr)
 
@@ -57,14 +53,14 @@ end
 Base.getindex(sr::SectorUnitRange, t::Tuple{Colon,<:Integer}) = sr[(:, last(t):last(t))]
 function Base.getindex(sr::SectorUnitRange, t::Tuple{Colon,<:AbstractUnitRange})
   return sectorunitrange(
-    nondual_sector(sr), multiplicity_range(sr)[last(t)], isdual(sr), offset(sr)
+    nondual_sector(sr), multiplicity_range(sr)[last(t)], isdual(sr), first(sr)
   )
 end
 
 Base.range(sr::SectorUnitRange) = first(sr):last(sr)
 
 function Base.show(io::IO, sr::SectorUnitRange)
-  print(io, nameof(typeof(sr)), " ", offset(sr), " .+ ")
+  print(io, nameof(typeof(sr)), " ", first(sr), " .+ ")
   if isdual(sr)
     print(io, "dual(", nondual_sector(sr), ")")
   else
@@ -82,19 +78,19 @@ end
 
 function dual(sr::SectorUnitRange)
   return sectorunitrange(
-    nondual_sector(sr), multiplicity_range(sr), !isdual(sr), offset(sr)
+    nondual_sector(sr), multiplicity_range(sr), !isdual(sr), first(sr)
   )
 end
 
 function flip(sr::SectorUnitRange)
   return sectorunitrange(
-    dual(nondual_sector(sr)), multiplicity_range(sr), !isdual(sr), offset(sr)
+    dual(nondual_sector(sr)), multiplicity_range(sr), !isdual(sr), first(sr)
   )
 end
 
 function map_blocklabels(f, sr::SectorUnitRange)
   return sectorunitrange(
-    f(nondual_sector(sr)), multiplicity_range(sr), isdual(sr), offset(sr)
+    f(nondual_sector(sr)), multiplicity_range(sr), isdual(sr), first(sr)
   )
 end
 
@@ -104,7 +100,7 @@ function space_isequal(sr1::SectorUnitRange, sr2::SectorUnitRange)
   return nondual_sector(sr1) == nondual_sector(sr2) &&
          isdual(sr1) == isdual(sr2) &&
          multiplicity_range(sr1) == multiplicity_range(sr2) &&
-         offset(sr1) == offset(sr2)
+         first(sr1) == first(sr2)
 end
 
 #

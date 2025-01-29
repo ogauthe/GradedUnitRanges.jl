@@ -62,7 +62,9 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   @test blockisequal(multiplicity_range(g2f), blockedrange([2, 1]))
   @test isdual(g2f)
 
-  @test_broken blockfirsts(g2) == first.(blocks(g2))
+  @test blockfirsts(g2) == first.(blocks(g2))
+  @test blocklasts(g2) == [6, 14]
+  @test space_isequal(mortar(blocks(g2)), g2)
 
   # slicing
   @test space_isequal(g2[Block.(1:2)], g2)
