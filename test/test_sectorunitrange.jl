@@ -40,7 +40,7 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
   @test length(sr) == 6
   @test firstindex(sr) == 1
   @test lastindex(sr) == 6
-  @test last(sr) == 9
+  @test last(sr) == 8
   @test eltype(sr) === Int
   @test eachindex(sr) == Base.oneto(6)
 
@@ -78,8 +78,8 @@ Base.length(s::AbstractSector) = quantum_dimension(s)
 
   # getindex
   @test_throws BoundsError sr[0]
-  @test_throws BoundsError sr[8]
-  for i in 1:7
+  @test_throws BoundsError sr[7]
+  for i in 1:6
     @test sr[i] == i + 2
   end
   @test sr[2:3] == 4:5

@@ -41,7 +41,7 @@ end  # TBD directly quantum_dimension(nondual_sector(sr))?
 Base.iterate(sr::SectorUnitRange) = iterate(first(sr):last(sr))
 Base.iterate(sr::SectorUnitRange, i::Integer) = iterate(first(sr):last(sr), i)
 
-Base.last(sr::SectorUnitRange) = first(sr) + length(sr)
+Base.last(sr::SectorUnitRange) = first(sr) + length(sr) - 1
 
 # slicing
 Base.getindex(sr::SectorUnitRange, i::Integer) = range(sr)[i]
