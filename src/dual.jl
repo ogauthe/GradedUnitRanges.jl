@@ -11,4 +11,5 @@ nondual_type(x) = nondual_type(typeof(x))
 nondual_type(T::Type) = T
 
 dual(i::LabelledInteger) = labelled(unlabel(i), dual(label(i)))
+dual(p::Pair{<:Any,<:Base.OneTo}) = dual(first(p)) => last(p)
 flip(a::AbstractUnitRange) = dual(map_blocklabels(dual, a))

@@ -42,8 +42,8 @@ end
 @testset "GradedUnitRanges basics" begin
   a0 = OneToOne()
   for a in (
-    blockedrange([labelled(2, "x"), labelled(3, "y")]),
-    gradedrange([labelled(2, "x"), labelled(3, "y")]),
+    blockedrange([labelled(2, "x" => 1:2), labelled(3, "y" => 1:3)]),
+    gradedrange([labelled(2, "x" => 1:2), labelled(3, "y" => 1:3)]),
     gradedrange(["x" => 2, "y" => 3]),
   )
     @test a isa GradedOneTo
@@ -54,23 +54,23 @@ end
     @test !labelled_isequal(a, 1:5)
     for x in iterate(a)
       @test x == 1
-      @test label(x) == "x"
+      @test label(x) == ("x" => 1)
     end
     for x in iterate(a, labelled(1, "x"))
       @test x == 2
-      @test label(x) == "x"
+      @test label(x) == ("x" => 1)
     end
     for x in iterate(a, labelled(2, "x"))
       @test x == 3
-      @test label(x) == "y"
+      @test label(x) == ("y" => 1)
     end
     for x in iterate(a, labelled(3, "y"))
       @test x == 4
-      @test label(x) == "y"
+      @test label(x) == ("y" => 1)
     end
     for x in iterate(a, labelled(4, "y"))
       @test x == 5
-      @test label(x) == "y"
+      @test label(x) == ("y" => 1)
     end
     @test isnothing(iterate(a, labelled(5, "y")))
     @test labelled_isequal(a, a)
@@ -86,17 +86,17 @@ end
     @test label(a[Block(2)]) == "y"
     @test a[Block(2)] isa LabelledUnitRange
     @test a[4] == 4
-    @test label(a[4]) == "y"
+    @test label(a[4]) == ("y" => 1)
     @test unlabel(a[4]) == 4
     @test blocklengths(a) == [2, 3]
     @test blocklabels(a) == ["x", "y"]
-    @test label.(blocklengths(a)) == ["x", "y"]
+    @test label.(blocklengths(a)) == ["x" => Base.oneto(2), "y" => Base.oneto(3)]
     @test blockfirsts(a) == [1, 3]
     @test label.(blockfirsts(a)) == ["x", "y"]
     @test first(a) == 1
-    @test label(first(a)) == "x"
+    @test label(first(a)) == ("x" => 1)
     @test blocklasts(a) == [2, 5]
-    @test label.(blocklasts(a)) == ["x", "y"]
+    @test label.(blocklasts(a)) == ["x" => Base.OneTo(2), "y" => Base.OneTo(3)]
     @test last(a) == 5
     @test label(last(a)) == "y"
     @test a[Block(2)] == 3:5
@@ -116,6 +116,13 @@ end
   # Slicing operations
   x = gradedrange(["x" => 2, "y" => 3])
   a = x[2:4]
+  @test a isa UnitRange
+  @test length(a) == 3
+  @test first(a) == 2
+  @test last(a) == 4
+
+  # TODO THIS MUST USE DIFFERENT SLICING
+  a = x[:, 2:4]  # or kronecker(:, 2:4)
   @test a isa GradedUnitRange
   @test length(a) == 3
   @test blocklength(a) == 2
@@ -135,7 +142,7 @@ end
   @test b isa GradedUnitRange
   @test b == 1:4
 
-  @test x[[2, 4]] == [labelled(2, "x"), labelled(4, "y")]
+  @test x[:, [2, 4]] == [labelled(2, "x"), labelled(4, "y")]
   @test labelled_isequal(x[BlockRange(1)], gradedrange(["x" => 2]))
 
   # Regression test for ambiguity error.
@@ -153,7 +160,7 @@ end
   @test label(a[Block(1)]) == "x"
 
   x = gradedrange(["x" => 2, "y" => 3])
-  a = x[3:4]
+  a = x[:, 3:4]
   @test a isa GradedUnitRange
   @test length(a) == 2
   @test blocklength(a) == 1

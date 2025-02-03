@@ -89,8 +89,8 @@ LabelledNumbers.label_type(g::AbstractGradedUnitRange) = label_type(typeof(g))
 LabelledNumbers.label_type(T::Type{<:AbstractGradedUnitRange}) = label_type(eltype(T))
 
 sector_type(x) = sector_type(typeof(x))
-sector_type(T::Type) = error("Not implemented")
-sector_type(T::Type{<:AbstractUnitRange}) = label_type(T)
+sector_type(::Type) = error("Not implemented")
+sector_type(T::Type{<:AbstractGradedUnitRange}) = fieldtype(label_type(T), 1)
 
 function gradedrange(lblocklengths::AbstractVector{<:LabelledInteger})
   brange = blockedrange(unlabel.(lblocklengths))
@@ -104,22 +104,32 @@ function BlockArrays.blockedrange(lblocklengths::AbstractVector{<:LabelledIntege
 end
 
 function Base.last(a::AbstractGradedUnitRange)
-  return isempty(a.lasts) ? labelled(first(a) - 1, label(first(a))) : last(a.lasts)
+  return isempty(a.lasts) ? first(a) - 1 : unlabel(last(a.lasts))
 end
 
 function gradedrange(lblocklengths::AbstractVector{<:Pair{<:Any,<:Integer}})
-  return gradedrange(labelled.(last.(lblocklengths), first.(lblocklengths)))
+  labels = first.(lblocklengths)
+  label_range_lengths = last.(lblocklengths)
+  return gradedrange(labelled_with_range(label_range_lengths .* length.(labels), labels))
+end
+
+function labelled_with_range(lasts, labels)
+  return labelled.(lasts, labels .=> Base.oneto.(length.(labels)))
 end
 
 function labelled_blocks(a::BlockedOneTo, labels)
   # TODO: Use `blocklasts(a)`? That might
   # cause a recursive loop.
-  return GradedOneTo(labelled.(a.lasts, labels))
+  return GradedOneTo(labelled_with_range(a.lasts, labels))
 end
 function labelled_blocks(a::BlockedUnitRange, labels)
   # TODO: Use `first(a)` and `blocklasts(a)`? Those might
   # cause a recursive loop.
-  return GradedUnitRange(labelled(a.first, labels[1]), labelled.(a.lasts, labels))
+  # TBD keep oneto? first(g) will not include it
+  # but it is necessary to keep the correct eltype
+  return GradedUnitRange(
+    labelled(a.first, labels[1] => Base.oneto(1)), labelled_with_range(a.lasts, labels)
+  )
 end
 
 function BlockArrays.findblock(a::AbstractGradedUnitRange, index::Integer)
@@ -142,7 +152,7 @@ end
 
 # Internal function
 function get_label(a::AbstractUnitRange, index::Block{1})
-  return label(blocklasts(a)[Int(index)])
+  return first(label(blocklasts(a)[Int(index)]))
 end
 
 # Internal function
@@ -156,6 +166,12 @@ function blocklabels(a::AbstractBlockVector)
   end
 end
 
+label_ranges(g::AbstractGradedUnitRange) = last.(label.(g.lasts))
+
+label_lengths(g::AbstractGradedUnitRange) = length.(label_ranges(g))
+
+sector_lengths(g::AbstractBlockedUnitRange) = blocklengths(g) .÷ label_lengths(g)
+
 function blocklabels(a::AbstractBlockedUnitRange)
   # Using `a.lasts` here since that is what is stored
   # inside of `BlockedUnitRange`, maybe change that.
@@ -165,7 +181,7 @@ function blocklabels(a::AbstractBlockedUnitRange)
   #   return label(@view(a[block]))
   # end
   #
-  return label.(a.lasts)
+  return first.(label.(a.lasts))
 end
 
 # TODO: This relies on internals of `BlockArrays`, maybe redesign
@@ -195,26 +211,27 @@ function BlockArrays.blockfirsts(a::AbstractGradedUnitRange)
 end
 
 function BlockArrays.blocklasts(a::AbstractGradedUnitRange)
-  return labelled.(blocklasts(unlabel_blocks(a)), blocklabels(a))
+  return labelled.(blocklasts(unlabel_blocks(a)), blocklabelsranges(a))
+end
+
+function blocklabelsranges(a::AbstractGradedUnitRange)
+  return blocklabels(a) .=> Base.oneto.(label_lengths(a))
 end
 
 function BlockArrays.blocklengths(a::AbstractGradedUnitRange)
-  return labelled.(blocklengths(unlabel_blocks(a)), blocklabels(a))
+  # TBD return blocklengths(unlabel_blocks(g))?
+  return labelled.(blocklengths(unlabel_blocks(a)), blocklabelsranges(a))
 end
 
 function gradedunitrange_first(a::AbstractUnitRange)
-  return labelled(first(unlabel_blocks(a)), label(a[Block(1)]))
+  return first(unlabel_blocks(a))
 end
 function Base.first(a::AbstractGradedUnitRange)
   return gradedunitrange_first(a)
 end
 
-Base.iterate(a::AbstractGradedUnitRange) = isempty(a) ? nothing : (first(a), first(a))
-function Base.iterate(a::AbstractGradedUnitRange, i)
-  i == last(a) && return nothing
-  next = a[i + step(a)]
-  return (next, next)
-end
+Base.iterate(a::AbstractGradedUnitRange) = iterate(unlabel_blocks(a))
+Base.iterate(a::AbstractGradedUnitRange, i) = iterate(unlabel_blocks(a), i)
 
 function firstblockindices(a::AbstractGradedUnitRange)
   return labelled.(firstblockindices(unlabel_blocks(a)), blocklabels(a))
@@ -268,8 +285,7 @@ end
 function blockedunitrange_getindices(
   ga::AbstractGradedUnitRange, indices::AbstractUnitRange{<:Integer}
 )
-  a_indices = blockedunitrange_getindices(unlabel_blocks(ga), indices)
-  return labelled_blocks(a_indices, blocklabels(ga, indices))
+  return unlabel_blocks(ga)[indices]
 end
 
 function blockedunitrange_getindices(a::AbstractGradedUnitRange, indices::BlockSlice)
@@ -285,7 +301,7 @@ function blockedunitrange_getindices(a::AbstractGradedUnitRange, indices::BlockI
 end
 
 function Base.getindex(a::AbstractGradedUnitRange, index::Integer)
-  return labelled(unlabel_blocks(a)[index], get_label(a, index))
+  return unlabel_blocks(a)[index]
 end
 
 function Base.getindex(a::AbstractGradedUnitRange, index::Block{1})
