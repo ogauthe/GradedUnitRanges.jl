@@ -300,19 +300,26 @@ function blockedunitrange_getindices(a::AbstractGradedUnitRange, indices::BlockI
   return a[block(indices)][blockindex(indices)]
 end
 
-function Base.getindex(a::AbstractGradedUnitRange, index::Integer)
-  return unlabel_blocks(a)[index]
+function Base.getindex(g::AbstractGradedUnitRange, index)
+  return gradedunitrange_getindices(g, index)
 end
 
-function Base.getindex(a::AbstractGradedUnitRange, index::Block{1})
-  return blockedunitrange_getindices(a, index)
+gradedunitrange_getindices(g, index) = unlabel_blocks(g)[index]
+function gradedunitrange_getindices(g, index::Pair) # placeholder for KroneckerProduct
+  return kronecker_indexing(g, index)
 end
 
-function Base.getindex(a::AbstractGradedUnitRange, indices::BlockIndexRange)
-  return blockedunitrange_getindices(a, indices)
+function kronecker_indexing(g, index::Pair{<:Block{1},<:Colon})
+  return labelled(
+    blockedunitrange_getindices(g, first(index)), blocklabels(g)[Int(first(index))]
+  )
 end
 
 # fix ambiguities
+function Base.getindex(g::AbstractGradedUnitRange{<:Integer}, index::Block{1})
+  return gradedunitrange_getindices(g, index)
+end
+Base.getindex(g::AbstractGradedUnitRange, i::Integer) = gradedunitrange_getindices(g, i)
 function Base.getindex(
   a::AbstractGradedUnitRange, indices::BlockArrays.BlockRange{1,<:Tuple{Base.OneTo}}
 )
@@ -321,11 +328,11 @@ end
 function Base.getindex(
   a::AbstractGradedUnitRange, indices::BlockRange{1,<:Tuple{AbstractUnitRange{Int}}}
 )
-  return blockedunitrange_getindices(a, indices)
+  return gradedunitrange_getindices(a, indices)
 end
 
 function Base.getindex(a::AbstractGradedUnitRange, indices::BlockIndex{1})
-  return blockedunitrange_getindices(a, indices)
+  return gradedunitrange_getindices(a, indices)
 end
 
 # Fixes ambiguity issues with:
@@ -336,10 +343,6 @@ end
 # getindex(::AbstractUnitRange, ::AbstractUnitRange{<:Integer})
 # ```
 function Base.getindex(a::AbstractGradedUnitRange, indices::BlockSlice)
-  return blockedunitrange_getindices(a, indices)
-end
-
-function Base.getindex(a::AbstractGradedUnitRange, indices)
   return blockedunitrange_getindices(a, indices)
 end
 
