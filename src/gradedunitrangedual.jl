@@ -62,7 +62,7 @@ function blockedunitrange_getindices(a::GradedUnitRangeDual, indices::BlockRange
   return dual(getindex(nondual(a), indices))
 end
 
-function blockedunitrange_getindices(a::GradedUnitRangeDual, indices::BlockIndexRange)
+function blockedunitrange_getindices(a::GradedUnitRangeDual, indices::BlockIndexRange{1})
   return dual(nondual(a)[indices])
 end
 
@@ -118,7 +118,7 @@ function dual_axes(v::BlockVector)
   return mortar(dual.(blocks(v)), block_axes)
 end
 
-Base.axes(a::GradedUnitRangeDual) = axes(nondual(a))
+Base.axes(a::GradedUnitRangeDual) = dual.(axes(nondual(a)))
 
 function BlockArrays.BlockSlice(b::Block, a::LabelledUnitRange)
   return BlockSlice(b, unlabel(a))
