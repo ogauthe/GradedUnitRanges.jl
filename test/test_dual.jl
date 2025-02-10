@@ -48,8 +48,8 @@ GradedUnitRanges.flip(s::DualU1) = U1(-nondual(s).n)
 GradedUnitRanges.isdual(::Type{DualU1}) = true
 GradedUnitRanges.sector_type(::Type{U1}) = U1
 GradedUnitRanges.sector_type(::Type{DualU1}) = U1
-dual_type(::Type{DualU1}) = U1
-dual_type(::Type{U1}) = DualU1
+GradedUnitRanges.dual_type(::Type{DualU1}) = U1
+GradedUnitRanges.dual_type(::Type{U1}) = DualU1
 Base.isless(c1::U1, c2::U1) = c1.n < c2.n
 Base.isless(c1::DualU1, c2::DualU1) = nondual(c1) < nondual(c2)
 
