@@ -21,6 +21,8 @@ dual(i::LabelledInteger) = labelled(unlabel(i), dual(label(i)))
 dual(a::AbstractUnitRange) = map_blocklabels(dual, a)
 flip(a::AbstractUnitRange) = map_blocklabels(flip, a)
 
+flip_dual(x) = isdual(x) ? flip(x) : x
+
 """
     dag(r::AbstractUnitRange)
 
