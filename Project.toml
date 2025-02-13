@@ -1,7 +1,7 @@
 name = "GradedUnitRanges"
 uuid = "e2de450a-8a67-46c7-b59c-01d5a3d041c5"
 authors = ["ITensor developers <support@itensor.org> and contributors"]
-version = "0.1.5"
+version = "0.1.6"
 
 [deps]
 BlockArrays = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
@@ -10,10 +10,17 @@ FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
 LabelledNumbers = "f856a3a6-4152-4ec4-b2a7-02c1a55d7993"
 SplitApplyCombine = "03a91e81-4c3e-53e1-a0a4-9c0c8f19dd66"
 
+[weakdeps]
+SymmetrySectors = "f8a8ad64-adbc-4fce-92f7-ffe2bb36a86e"
+
+[extensions]
+GradedUnitRangesSymmetrySectorsExt = "SymmetrySectors"
+
 [compat]
 BlockArrays = "1.2.0"
 Compat = "4.16.0"
 FillArrays = "1.13.0"
 LabelledNumbers = "0.1.0"
 SplitApplyCombine = "1.2.3"
+SymmetrySectors = "0.1.4"
 julia = "1.10"
