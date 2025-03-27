@@ -27,6 +27,7 @@ a0 = gradedrange([U1(1) => 1, U1(2) => 3, U1(1) => 1])
   GradedUnitRanges.fuse_labels(x::String, y::String) = x * y
 
   @test unmerged_tensor_product() isa OneToOne
+  @test unmerged_tensor_product(OneToOne(), OneToOne()) isa OneToOne
 
   a = gradedrange(["x" => 2, "y" => 3])
   @test labelled_isequal(unmerged_tensor_product(a), a)
@@ -62,6 +63,9 @@ end
 
 @testset "symmetric tensor_product" begin
   for a in (a0, a0[1:5])
+    @test labelled_isequal(unmerged_tensor_product(a), a)
+    @test labelled_isequal(unmerged_tensor_product(a, OneToOne()), a)
+    @test labelled_isequal(unmerged_tensor_product(OneToOne(), a), a)
     @test labelled_isequal(tensor_product(a), gradedrange([U1(1) => 2, U1(2) => 3]))
 
     @test labelled_isequal(
@@ -88,6 +92,8 @@ end
     b = unmerged_tensor_product(ad)
     @test isdual(b)
     @test space_isequal(b, ad)
+    @test space_isequal(unmerged_tensor_product(ad, OneToOne()), ad)
+    @test space_isequal(unmerged_tensor_product(OneToOne(), ad), ad)
 
     b = tensor_product(ad)
     @test b isa GradedOneTo
